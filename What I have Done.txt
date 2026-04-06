@@ -1,0 +1,10 @@
+- The model does not perform medical diagnosis, but classifies MRI images based on learned visual patterns associated with Multiple Sclerosis.
+
+- The dataset was programmatically downloaded and managed using Kagglehub to ensure reproducibility and eliminate manual intervention in the data acquisition pipeline. The model was trained from scratch without using any pre-trained weights.
+
+- A custom convolutional neural network was designed and trained from scratch using batch normalization, dropout, and adaptive average pooling to ensure training stability and robustness for MRI-based multiple sclerosis classification.
+
+- Data augmentation was applied online during training rather than during dataset preparation to ensure stochastic variability and to prevent distribution shift between training and validation sets.
+
+- 
+
