@@ -29,7 +29,7 @@ datasets/
 
 # Logs
 *.log
-
+*.txt
 # Jupyter
 .ipynb_checkpoints
 

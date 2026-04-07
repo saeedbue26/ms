@@ -1,7 +1,5 @@
-# ======================================================
-# train.py - MRI MS Classification (CNN from scratch)
-# Graduation Project - Senior Level (Medical AI)
-# ======================================================
+# MRI Multiple Sclerosis Classification (CNN from scratch)
+
 
 import os
 import torch
@@ -26,30 +24,21 @@ print("Using device:", device)
 
 
 
-# ======================================================
-# Reproducibility (Senior / Research practice)
-# ======================================================
+# Reproducibility
 torch.manual_seed(42)
 torch.cuda.manual_seed_all(42)
 
 
-# ======================================================
 # Device Configuration
-# ======================================================
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
 
 
-# ======================================================
 # Ensure directories exist
-# ======================================================
 os.makedirs("models", exist_ok=True)
 
 
-# ======================================================
 # Data Loading Function
-# (Uses preprocessed_clean images)
-# ======================================================
 def load_data(split):
     X, y = [], []
     for label, cls in enumerate(["control", "ms"]):
@@ -61,9 +50,7 @@ def load_data(split):
     return X, y
 
 
-# ======================================================
 # Data Augmentation (MRI-Safe & Conservative)
-# ======================================================
 train_tf = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.RandomHorizontalFlip(p=0.5),  # MRI-safe
@@ -89,9 +76,7 @@ val_tf = transforms.Compose([
 ])
 
 
-# ======================================================
 # Load Datasets
-# ======================================================
 X_train, y_train = load_data("train")
 X_val, y_val = load_data("val")
 
@@ -118,16 +103,12 @@ print(f"Training samples: {len(train_ds)}")
 print(f"Validation samples: {len(val_ds)}")
 
 
-# ======================================================
 # Model
-# ======================================================
 model = CNN().to(device)
 print("Model initialized.")
 
 
-# ======================================================
 # Loss Function (Medical-aware)
-# ======================================================
 class_weights = torch.tensor([1.0, 1.4]).to(device)
 
 criterion = nn.CrossEntropyLoss(
@@ -136,9 +117,7 @@ criterion = nn.CrossEntropyLoss(
 )
 
 
-# ======================================================
 # Optimizer & Scheduler
-# ======================================================
 optimizer = torch.optim.AdamW(
     model.parameters(),
     lr=1e-3,
@@ -153,9 +132,7 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
 )
 
 
-# ======================================================
 # Training Configuration
-# ======================================================
 num_epochs = 40
 best_acc = 0.0
 
@@ -163,12 +140,10 @@ early_stop_patience = 6
 early_stop_counter = 0
 
 
-# ======================================================
 # Training Loop
-# ======================================================
 for epoch in range(num_epochs):
 
-    # ------------------ Training ------------------
+    # Training
     model.train()
     train_loss = 0.0
 
@@ -191,7 +166,7 @@ for epoch in range(num_epochs):
 
     train_loss /= len(train_dl)
 
-    # ------------------ Validation ------------------
+    # Validation
     model.eval()
     val_loss = 0.0
     preds, true = [], []
@@ -211,7 +186,7 @@ for epoch in range(num_epochs):
     val_loss /= len(val_dl)
     val_acc = accuracy_score(true, preds)
 
-    # ------------------ Logging ------------------
+    # Logging
     print(
         f"Epoch [{epoch+1}/{num_epochs}] | "
         f"Train Loss: {train_loss:.4f} | "
@@ -219,11 +194,11 @@ for epoch in range(num_epochs):
         f"Val Acc: {val_acc:.4f}"
     )
 
-    # ------------------ Scheduler ------------------
+    # Scheduler
     scheduler.step(val_acc)
     current_lr = optimizer.param_groups[0]["lr"]
     print(f"Current LR: {current_lr:.6f}")
-    # ------------------ Early Stopping & Saving ------------------
+    # Early Stopping & Saving
     if val_acc > best_acc:
         best_acc = val_acc
         early_stop_counter = 0
@@ -246,9 +221,7 @@ for epoch in range(num_epochs):
         break
 
 
-# ======================================================
 # Save Last Model
-# ======================================================
 torch.save(
     model.state_dict(),
     "models/cnn_ms_last.pth"

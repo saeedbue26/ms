@@ -29,7 +29,7 @@ class CNN(nn.Module):
         # Output will always be (128, 7, 7)
         self.adaptive_pool = nn.AdaptiveAvgPool2d((7, 7))
 
-        # -------- Fully Connected Layers --------
+        # Fully Connected Layers
         self.fc1 = nn.Linear(128 * 7 * 7, 256)
         self.dropout = nn.Dropout(p=0.5)
         self.fc2 = nn.Linear(256, 2)  # Binary classification (MS / Control)

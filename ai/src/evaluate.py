@@ -13,11 +13,11 @@ import matplotlib.pyplot as plt
 from dataset import MRIDataset
 from model import CNN
 
-# ---------------- Device ----------------
+# Device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
 
-# ---------------- Load Data ----------------
+# Load Data
 def load_data(split):
     X, y = [], []
     for label, cls in enumerate(["control", "ms"]):
@@ -37,12 +37,12 @@ X_val, y_val = load_data("val")
 val_ds = MRIDataset(X_val, y_val, val_tf)
 val_dl = DataLoader(val_ds, batch_size=8, shuffle=False)
 
-# ---------------- Load Model ----------------
+# Load Model
 model = CNN().to(device)
 model.load_state_dict(torch.load("models/cnn_ms_best.pth", map_location=device))
 model.eval()
 
-# ---------------- Inference ----------------
+# Inference
 y_true = []
 y_pred = []
 
@@ -55,7 +55,7 @@ with torch.no_grad():
         y_pred.extend(preds)
         y_true.extend(labels.numpy())
 
-# ---------------- Metrics ----------------
+# Metrics
 print("\nClassification Report:")
 print(classification_report(
     y_true,
@@ -65,7 +65,7 @@ print(classification_report(
 
 cm = confusion_matrix(y_true, y_pred)
 
-# ---------------- Confusion Matrix Plot ----------------
+# Confusion Matrix Plot
 disp = ConfusionMatrixDisplay(confusion_matrix=cm,
                               display_labels=["Control", "MS"])
 disp.plot(cmap="Blues")
